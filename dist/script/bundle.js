@@ -50399,20 +50399,24 @@ var AuthorForm = React.createClass({displayName: "AuthorForm",
       React.createElement("form", null, 
         React.createElement("label", {htmlFor: "firstName"}, "First Name"), 
         React.createElement("input", {
+          name: "firstName", 
           type: "text", 
           className: "form-control", 
-          value: "", 
+          value: this.props.author.firstName, 
           ref: "firstName", 
-          placeholder: "First Name"}
+          placeholder: "First Name", 
+          onChange: this.props.onChangeHandler}
         ), 
 
         React.createElement("label", {htmlFor: "lastName"}, "First Name"), 
         React.createElement("input", {
+          name: "lastName", 
           type: "text", 
           className: "form-control", 
-          value: "", 
+          value: this.props.author.lastName, 
           ref: "lastName", 
-          placeholder: "Last Name"}
+          placeholder: "Last Name", 
+          onChange: this.props.onChangeHandler}
         ), 
 
         React.createElement("input", {type: "submit", value: "Save", className: "btn btn-default"})
@@ -50506,13 +50510,33 @@ var React = require('react');
 var AuthorForm = require('./authorForm');
 
 var ManageAuthorPage = React.createClass({displayName: "ManageAuthorPage",
+  getInitialState: function () {
+    return {
+      author: {
+        id: '',
+        firstName: '',
+        lastName: ''
+      }
+    }
+  },
+
+  changeAuthor: function (event) {
+    var fieldName = event.target.name;
+    var fieldValue = event.target.value;
+
+    this.state.author[fieldName] = fieldValue;
+    this.setState({
+      author: this.state.author
+    });
+  },
+
   render: function () {
     return (
       React.createElement("div", null, 
         React.createElement("h1", null, 
           "Create a new author."
         ), 
-        React.createElement(AuthorForm, null)
+        React.createElement(AuthorForm, {author: this.state.author, onChangeHandler: this.changeAuthor})
       )
     );
   }
