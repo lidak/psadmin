@@ -16,11 +16,21 @@ var ManageAuthorPage = React.createClass({
         id: '',
         firstName: '',
         lastName: ''
+      },
+      errors: {}
+    }
+  },
+
+  statics: {
+    willTransitionFrom: function (transition, component) {
+      if (component.state.dirty && !confirm('Leave without saving?')) {
+        transition.abort();
       }
     }
   },
 
   changeAuthor: function (event) {
+    this.setState({dirty: true});
     var fieldName = event.target.name;
     var fieldValue = event.target.value;
 
@@ -30,8 +40,32 @@ var ManageAuthorPage = React.createClass({
     });
   },
 
+  authorFormIsValid: function () {
+    var formIsValid = true;
+
+    this.state.errors = {};
+
+    if(this.state.author.firstName.length < 3) {
+      this.state.errors.firstName = 'Fist name should be at least 3 characters long.';
+      formIsValid = false;
+    }
+
+    if(this.state.author.lastName.length < 3) {
+      this.state.errors.lastName = 'Last name is too short.';
+      formIsValid = false;
+    }
+
+    this.setState({errors: this.state.errors})
+
+    return formIsValid;
+  },
+
   saveAuthor: function (event) {
     event.preventDefault();
+    this.setState({dirty: false});
+    if(!this.authorFormIsValid()) {
+        return;
+    }
 
     AuthorApi.saveAuthor(this.state.author);
     toastr.success('Author saved.')
@@ -48,6 +82,7 @@ var ManageAuthorPage = React.createClass({
           author={this.state.author}
           onChangeHandler={this.changeAuthor}
           saveAuthor={this.saveAuthor}
+          errors={this.state.errors}
         />
       </div>
     );
